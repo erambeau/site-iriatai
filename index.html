@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Iriatai — Bijoux de Nouvelle-Calédonie</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400;1,600&family=Jost:wght@200;300;400&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+  <!-- Loader -->
+  <div id="loader">
+    <div class="loader-brand">IRIATAI</div>
+    <div class="loader-track">
+      <div id="loader-bar"></div>
+    </div>
+    <div id="loader-percent">0%</div>
+  </div>
+
+  <!-- Header fixe -->
+  <header class="site-header">
+    <div class="header-logo">IRIATAI</div>
+    <nav class="header-nav">
+      <a href="#contact">Contacter</a>
+    </nav>
+  </header>
+
+  <!-- Hero standalone -->
+  <section class="hero-standalone" id="hero">
+    <div class="hero-inner">
+      <span class="hero-label">Nouvelle-Calédonie</span>
+      <h1 class="hero-heading">
+        <span class="word">Fait</span>
+        <span class="word">main.</span>
+        <span class="word hero-italic">Porté</span>
+        <span class="word hero-italic">à vie.</span>
+      </h1>
+      <p class="hero-tagline">Bijoux artisanaux — pièces uniques</p>
+    </div>
+    <div class="hero-scroll-indicator">
+      <svg width="24" height="40" viewBox="0 0 24 40" fill="none">
+        <rect x="1" y="1" width="22" height="38" rx="11" stroke="currentColor" stroke-width="1.5"/>
+        <circle class="scroll-dot" cx="12" cy="10" r="3" fill="currentColor"/>
+      </svg>
+    </div>
+  </section>
+
+  <!-- Canvas (fixed) -->
+  <div class="canvas-wrap" id="canvas-wrap">
+    <canvas id="canvas"></canvas>
+  </div>
+
+  <!-- Overlay sombre (fixed) -->
+  <div id="dark-overlay"></div>
+
+  <!-- Marquee raie -->
+  <div class="marquee-wrap" id="marquee-manta" data-scroll-speed="-28">
+    <div class="marquee-text">IRIATAI &nbsp;&nbsp;&mdash;&nbsp;&nbsp; NOUVELLE-CALÉDONIE &nbsp;&nbsp;&mdash;&nbsp;&nbsp; FAIT MAIN &nbsp;&nbsp;&mdash;&nbsp;&nbsp; IRIATAI &nbsp;&nbsp;&mdash;&nbsp;&nbsp; NOUVELLE-CALÉDONIE &nbsp;&nbsp;&mdash;&nbsp;&nbsp; FAIT MAIN &nbsp;&nbsp;&mdash;&nbsp;&nbsp;</div>
+  </div>
+
+  <!-- Conteneur de scroll principal -->
+  <div id="scroll-container">
+
+    <!-- Section 1 : Iriatai — présentation marque -->
+    <section class="scroll-section section-content align-left"
+             data-enter="8" data-leave="24" data-animation="slide-left">
+      <div class="section-inner">
+        <span class="section-label">001 — La marque</span>
+        <h2 class="section-heading">Iriatai.</h2>
+        <p class="section-body">La surface de la mer, là où la lumière change à chaque heure. Chaque pièce naît en Nouvelle-Calédonie, à la main, avec la lenteur que mérite chaque bijou.</p>
+      </div>
+    </section>
+
+    <!-- Section 2 : Le collier -->
+    <section class="scroll-section section-content align-right"
+             data-enter="26" data-leave="42" data-animation="fade-up">
+      <div class="section-inner">
+        <span class="section-label">002 — Le collier</span>
+        <h2 class="section-heading">Un bijou fin,<br/><em>structuré</em>.</h2>
+        <p class="section-body">Conçu pour être porté chaque jour. Fabriqué pour traverser le temps. Entre 150 et 400€, chaque pièce est une création à part entière.</p>
+      </div>
+    </section>
+
+    <!-- Section 3 : La raie manta -->
+    <section class="scroll-section section-manta"
+             data-enter="44" data-leave="60" data-animation="scale-up">
+      <div class="manta-container">
+        <div class="manta-svg-wrap" id="manta-svg-wrap">
+          <!-- SVG raie manta inline -->
+          <svg class="manta-svg" id="manta-svg" viewBox="0 0 800 400" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <!-- Corps principal -->
+            <path d="M400 200
+              C 350 140, 220 100, 80 160
+              C 30 180, 10 200, 20 220
+              C 40 250, 120 240, 200 220
+              C 280 200, 340 195, 400 200
+              C 460 205, 520 200, 600 220
+              C 680 240, 760 250, 780 220
+              C 790 200, 770 180, 720 160
+              C 580 100, 450 140, 400 200Z"
+              fill="currentColor" opacity="0.18"/>
+            <!-- Aile gauche — détail -->
+            <path d="M400 200
+              C 360 160, 250 120, 120 155
+              C 70 168, 30 188, 25 210"
+              stroke="currentColor" stroke-width="1" opacity="0.35" fill="none"/>
+            <!-- Aile droite — détail -->
+            <path d="M400 200
+              C 440 160, 550 120, 680 155
+              C 730 168, 770 188, 775 210"
+              stroke="currentColor" stroke-width="1" opacity="0.35" fill="none"/>
+            <!-- Queue -->
+            <path d="M400 200 C 400 230, 398 270, 392 320 C 390 340, 385 360, 380 375"
+              stroke="currentColor" stroke-width="1.5" opacity="0.4" fill="none" stroke-linecap="round"/>
+            <!-- Céphalopodes (cornes) -->
+            <path d="M370 185 C 360 170, 345 158, 330 150"
+              stroke="currentColor" stroke-width="1" opacity="0.3" fill="none" stroke-linecap="round"/>
+            <path d="M430 185 C 440 170, 455 158, 470 150"
+              stroke="currentColor" stroke-width="1" opacity="0.3" fill="none" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="section-inner manta-text">
+          <span class="section-label">003 — Le symbole</span>
+          <p class="section-body manta-quote">"Iriatai, c'est aussi une raie qui traverse le lagon en silence. Pas de bruit, pas de hâte. Juste la grâce d'être là."</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 4 : Savoir-faire -->
+    <section class="scroll-section section-content align-left"
+             data-enter="62" data-leave="78" data-animation="stagger-up">
+      <div class="section-inner">
+        <span class="section-label">004 — Savoir-faire</span>
+        <h2 class="section-heading">Le geste<br/>qui reste.</h2>
+        <p class="section-body">Chaque pièce prend plusieurs heures. Aucune n'est identique. C'est la trace du geste qui reste.</p>
+        <ul class="craft-list">
+          <li class="craft-item"><span class="craft-num">01</span><span>Conception à la main</span></li>
+          <li class="craft-item"><span class="craft-num">02</span><span>Pièces uniques, non reproductibles</span></li>
+          <li class="craft-item"><span class="craft-num">03</span><span>Matériaux sélectionnés en Calédonie</span></li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- Section 5 : CTA -->
+    <section class="scroll-section section-cta"
+             data-enter="82" data-leave="100" data-animation="fade-up" data-persist="true" id="contact">
+      <div class="section-inner cta-inner">
+        <span class="section-label">Prendre contact</span>
+        <h2 class="section-heading cta-heading">Faire le voyage.</h2>
+        <p class="section-body">Chaque bijou Iriatai est une pièce unique. Pour en faire vôtre, une seule façon : nous écrire.</p>
+        <a href="mailto:contact@iriatai.nc" class="cta-button">Contacter Iriatai</a>
+        <p class="cta-note">Nouvelle-Calédonie — Livraison internationale</p>
+      </div>
+    </section>
+
+  </div><!-- /#scroll-container -->
+
+  <script src="https://cdn.jsdelivr.net/npm/lenis@1/dist/lenis.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/gsap.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/ScrollTrigger.min.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

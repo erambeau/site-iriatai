@@ -1,0 +1,544 @@
+/* ============================================================
+   IRIATAI — Design System
+   Palette : #07090F (fond), #E8E4DC (nacre), #fff (texte)
+   Typo    : Cormorant Garamond (display) + Jost (corps)
+   ============================================================ */
+
+:root {
+  --bg:         #07090F;
+  --nacre:      #E8E4DC;
+  --text:       #dbd7ce;
+  --text-dim:   #7c7a76;
+  --accent:     #E8E4DC;
+  --font-d:     'Cormorant Garamond', Georgia, serif;
+  --font-b:     'Jost', system-ui, sans-serif;
+}
+
+/* ── Reset ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-b);
+  font-weight: 300;
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  background: var(--bg);
+  overflow-x: hidden;
+  /* Lenis prend la main sur le scroll */
+}
+
+/* ── Loader ── */
+#loader {
+  position: fixed;
+  inset: 0;
+  background: var(--bg);
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2rem;
+  transition: opacity 0.8s ease, visibility 0.8s ease;
+}
+
+#loader.hidden {
+  opacity: 0;
+  visibility: hidden;
+}
+
+.loader-brand {
+  font-family: var(--font-d);
+  font-size: clamp(2rem, 6vw, 4rem);
+  font-weight: 300;
+  letter-spacing: 0.5em;
+  color: var(--nacre);
+}
+
+.loader-track {
+  width: min(320px, 60vw);
+  height: 1px;
+  background: rgba(232, 228, 220, 0.15);
+  position: relative;
+  overflow: hidden;
+}
+
+#loader-bar {
+  height: 100%;
+  width: 0%;
+  background: var(--nacre);
+  transition: width 0.1s linear;
+}
+
+#loader-percent {
+  font-family: var(--font-b);
+  font-size: 0.75rem;
+  letter-spacing: 0.2em;
+  color: var(--text-dim);
+}
+
+/* ── Header ── */
+.site-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 2rem 4vw;
+  mix-blend-mode: normal;
+  pointer-events: none;
+}
+
+.header-logo {
+  font-family: var(--font-d);
+  font-size: 1.1rem;
+  font-weight: 400;
+  letter-spacing: 0.35em;
+  color: var(--nacre);
+  pointer-events: auto;
+}
+
+.header-nav a {
+  font-family: var(--font-b);
+  font-size: 0.75rem;
+  font-weight: 300;
+  letter-spacing: 0.18em;
+  color: var(--text-dim);
+  text-decoration: none;
+  pointer-events: auto;
+  transition: color 0.3s;
+}
+
+.header-nav a:hover {
+  color: var(--nacre);
+}
+
+/* ── Hero standalone ── */
+.hero-standalone {
+  position: relative;
+  height: 100vh;
+  background: var(--bg);
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 0 8vw;
+  z-index: 10;
+  overflow: hidden;
+}
+
+/* Lignes de grille décoratives -->
+.hero-standalone::before {
+  content: '';
+  position: absolute;
+  top: 0; bottom: 0;
+  left: 50%;
+  width: 1px;
+  background: rgba(232, 228, 220, 0.05);
+  pointer-events: none;
+}
+
+.hero-inner {
+  max-width: 55vw;
+}
+
+.hero-label {
+  display: block;
+  font-family: var(--font-b);
+  font-size: 0.7rem;
+  font-weight: 300;
+  letter-spacing: 0.25em;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  margin-bottom: 2.5rem;
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+.hero-heading {
+  font-family: var(--font-d);
+  font-size: clamp(4rem, 10vw, 10rem);
+  font-weight: 300;
+  line-height: 1.0;
+  color: var(--nacre);
+  margin-bottom: 2.5rem;
+}
+
+.hero-heading .word {
+  display: inline-block;
+  margin-right: 0.2em;
+  opacity: 0;
+  transform: translateY(60px);
+}
+
+.hero-heading .hero-italic {
+  font-style: italic;
+  font-weight: 300;
+}
+
+.hero-tagline {
+  font-family: var(--font-b);
+  font-size: 0.8rem;
+  font-weight: 200;
+  letter-spacing: 0.3em;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+.hero-scroll-indicator {
+  position: absolute;
+  bottom: 3rem;
+  left: 50%;
+  transform: translateX(-50%);
+  color: var(--text-dim);
+  opacity: 0;
+  animation: scrollPulse 2s ease-in-out infinite;
+}
+
+.scroll-dot {
+  animation: dotMove 2s ease-in-out infinite;
+}
+
+@keyframes dotMove {
+  0%, 100% { cy: 10; opacity: 1; }
+  50%       { cy: 22; opacity: 0.3; }
+}
+
+@keyframes scrollPulse {
+  0%, 100% { opacity: 0.4; }
+  50%       { opacity: 0.8; }
+}
+
+/* ── Canvas ── */
+.canvas-wrap {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  clip-path: circle(0% at 50% 50%);
+  will-change: clip-path;
+}
+
+#canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* ── Overlay sombre ── */
+#dark-overlay {
+  position: fixed;
+  inset: 0;
+  background: var(--bg);
+  opacity: 0;
+  z-index: 2;
+  pointer-events: none;
+  will-change: opacity;
+}
+
+/* ── Marquee ── */
+.marquee-wrap {
+  position: fixed;
+  bottom: 3.5rem;
+  left: 0;
+  right: 0;
+  z-index: 5;
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+  will-change: opacity;
+}
+
+.marquee-text {
+  font-family: var(--font-d);
+  font-size: clamp(8vw, 12vw, 14vw);
+  font-weight: 300;
+  font-style: italic;
+  color: rgba(232, 228, 220, 0.06);
+  white-space: nowrap;
+  display: inline-block;
+  will-change: transform;
+}
+
+/* ── Scroll container ── */
+#scroll-container {
+  position: relative;
+  height: 840vh;
+}
+
+/* ── Sections communes ── */
+.scroll-section {
+  position: absolute;
+  left: 0;
+  right: 0;
+  transform: translateY(-50%);
+  z-index: 10;
+  pointer-events: none;
+  visibility: visible;
+}
+
+.section-inner {
+  padding: 4rem 0;
+}
+
+/* Zones latérales */
+.align-left {
+  padding-left: 6vw;
+  padding-right: 52vw;
+}
+
+.align-left .section-inner {
+  max-width: 38vw;
+}
+
+.align-right {
+  padding-left: 54vw;
+  padding-right: 6vw;
+}
+
+.align-right .section-inner {
+  max-width: 38vw;
+}
+
+/* Étiquettes */
+.section-label {
+  display: block;
+  font-family: var(--font-b);
+  font-size: 0.65rem;
+  font-weight: 300;
+  letter-spacing: 0.22em;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  margin-bottom: 1.8rem;
+}
+
+/* Titres sections */
+.section-heading {
+  font-family: var(--font-d);
+  font-size: clamp(2.5rem, 5.5vw, 5.5rem);
+  font-weight: 300;
+  line-height: 1.1;
+  color: var(--nacre);
+  margin-bottom: 1.8rem;
+}
+
+.section-heading em {
+  font-style: italic;
+  font-weight: 300;
+}
+
+/* Corps de texte */
+.section-body {
+  font-family: var(--font-b);
+  font-size: clamp(0.85rem, 1.1vw, 1rem);
+  font-weight: 300;
+  line-height: 1.85;
+  color: var(--text);
+  max-width: 36ch;
+}
+
+/* ── Section raie manta ── */
+.section-manta {
+  position: absolute;
+  left: 0;
+  right: 0;
+  transform: translateY(-50%);
+  z-index: 10;
+}
+
+.manta-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding-right: 8vw;
+  min-height: 60vh;
+}
+
+.manta-svg-wrap {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-60%, -50%);
+  width: 60vw;
+  max-width: 800px;
+  opacity: 0;
+  pointer-events: none;
+  will-change: transform, opacity;
+}
+
+.manta-svg {
+  width: 100%;
+  height: auto;
+  color: var(--nacre);
+}
+
+.manta-text {
+  position: relative;
+  z-index: 2;
+  max-width: 34ch;
+  padding: 4rem 0;
+  text-align: right;
+}
+
+.manta-quote {
+  font-family: var(--font-d);
+  font-size: clamp(1.1rem, 2.2vw, 2rem);
+  font-style: italic;
+  font-weight: 300;
+  line-height: 1.6;
+  color: var(--nacre);
+  max-width: 100%;
+}
+
+/* ── Liste savoir-faire ── */
+.craft-list {
+  list-style: none;
+  margin-top: 2.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+.craft-item {
+  display: flex;
+  align-items: baseline;
+  gap: 1.2rem;
+  font-family: var(--font-b);
+  font-size: 0.82rem;
+  font-weight: 300;
+  color: var(--text);
+  letter-spacing: 0.05em;
+}
+
+.craft-num {
+  font-family: var(--font-d);
+  font-style: italic;
+  font-size: 1.1rem;
+  color: var(--text-dim);
+  flex-shrink: 0;
+}
+
+/* ── Section CTA ── */
+.section-cta {
+  padding: 0 8vw;
+  text-align: left;
+}
+
+.cta-inner {
+  max-width: 44ch;
+}
+
+.cta-heading {
+  font-size: clamp(3.5rem, 7vw, 7rem);
+}
+
+.cta-button {
+  display: inline-block;
+  margin-top: 3rem;
+  padding: 1.1rem 3rem;
+  border: 1px solid rgba(232, 228, 220, 0.4);
+  color: var(--nacre);
+  font-family: var(--font-b);
+  font-size: 0.78rem;
+  font-weight: 300;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  text-decoration: none;
+  pointer-events: auto;
+  transition: background 0.4s ease, color 0.4s ease, border-color 0.4s ease;
+}
+
+.cta-button:hover {
+  background: var(--nacre);
+  color: var(--bg);
+  border-color: var(--nacre);
+}
+
+.cta-note {
+  margin-top: 1.5rem;
+  font-family: var(--font-b);
+  font-size: 0.68rem;
+  font-weight: 300;
+  letter-spacing: 0.18em;
+  color: var(--text-dim);
+  text-transform: uppercase;
+}
+
+/* ── Iridescence subtile sur le canvas ── */
+.canvas-wrap::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    ellipse at 30% 60%,
+    rgba(120, 160, 200, 0.04) 0%,
+    transparent 60%
+  );
+  pointer-events: none;
+  mix-blend-mode: screen;
+}
+
+/* ============================================================
+   MOBILE
+   ============================================================ */
+@media (max-width: 768px) {
+  #scroll-container {
+    height: 600vh;
+  }
+
+  .hero-inner {
+    max-width: 90vw;
+  }
+
+  .align-left,
+  .align-right {
+    padding-left: 6vw;
+    padding-right: 6vw;
+  }
+
+  .align-left .section-inner,
+  .align-right .section-inner {
+    max-width: 100%;
+    background: rgba(7, 9, 15, 0.82);
+    padding: 2rem;
+    backdrop-filter: blur(4px);
+  }
+
+  .manta-container {
+    flex-direction: column;
+    justify-content: center;
+    padding: 4rem 6vw;
+  }
+
+  .manta-svg-wrap {
+    position: relative;
+    left: auto;
+    top: auto;
+    transform: none;
+    width: 90vw;
+    margin-bottom: 2rem;
+  }
+
+  .manta-text {
+    text-align: left;
+  }
+
+  .section-cta {
+    padding: 0 6vw;
+  }
+
+  .marquee-text {
+    font-size: 18vw;
+  }
+
+  .hero-heading {
+    font-size: clamp(3rem, 14vw, 6rem);
+  }
+}
