@@ -11,7 +11,7 @@
 </head>
 <body>
 
-  <!-- Loader -->
+  <!-- ── Loader ── -->
   <div id="loader">
     <div class="loader-brand">IRIATAI</div>
     <div class="loader-track">
@@ -20,7 +20,7 @@
     <div id="loader-percent">0%</div>
   </div>
 
-  <!-- Header fixe -->
+  <!-- ── Header fixe ── -->
   <header class="site-header">
     <div class="header-logo">IRIATAI</div>
     <nav class="header-nav">
@@ -28,131 +28,87 @@
     </nav>
   </header>
 
-  <!-- Hero standalone -->
+  <!-- ── Hero standalone (texte d'accroche, pas de bijou) ── -->
   <section class="hero-standalone" id="hero">
     <div class="hero-inner">
-      <span class="hero-label">Nouvelle-Calédonie</span>
+      <span class="hero-label">Nouvelle-Calédonie — Bijoux artisanaux</span>
       <h1 class="hero-heading">
         <span class="word">Fait</span>
         <span class="word">main.</span>
+        <br/>
         <span class="word hero-italic">Porté</span>
         <span class="word hero-italic">à vie.</span>
       </h1>
-      <p class="hero-tagline">Bijoux artisanaux — pièces uniques</p>
+      <p class="hero-tagline">Un atelier. Des pièces uniques. Jamais en série.</p>
     </div>
-    <div class="hero-scroll-indicator">
-      <svg width="24" height="40" viewBox="0 0 24 40" fill="none">
-        <rect x="1" y="1" width="22" height="38" rx="11" stroke="currentColor" stroke-width="1.5"/>
+
+    <div class="hero-scroll-indicator" id="hero-scroll-hint">
+      <svg width="24" height="36" viewBox="0 0 24 36" fill="none">
+        <rect x="1" y="1" width="22" height="34" rx="11" stroke="currentColor" stroke-width="1"/>
         <circle class="scroll-dot" cx="12" cy="10" r="3" fill="currentColor"/>
       </svg>
     </div>
   </section>
 
-  <!-- Canvas (fixed) -->
+  <!-- ── Canvas (fixed, révélé par circle-wipe) ── -->
   <div class="canvas-wrap" id="canvas-wrap">
     <canvas id="canvas"></canvas>
   </div>
 
-  <!-- Overlay sombre (fixed) -->
+  <!-- ── Overlay sombre (fond semi-opaque sur les textes) ── -->
   <div id="dark-overlay"></div>
 
-  <!-- Marquee raie -->
-  <div class="marquee-wrap" id="marquee-manta" data-scroll-speed="-28">
+  <!-- ── Marquee décoratif ── -->
+  <div class="marquee-wrap" id="marquee-main" data-scroll-speed="-28">
     <div class="marquee-text">IRIATAI &nbsp;&nbsp;&mdash;&nbsp;&nbsp; NOUVELLE-CALÉDONIE &nbsp;&nbsp;&mdash;&nbsp;&nbsp; FAIT MAIN &nbsp;&nbsp;&mdash;&nbsp;&nbsp; IRIATAI &nbsp;&nbsp;&mdash;&nbsp;&nbsp; NOUVELLE-CALÉDONIE &nbsp;&nbsp;&mdash;&nbsp;&nbsp; FAIT MAIN &nbsp;&nbsp;&mdash;&nbsp;&nbsp;</div>
   </div>
 
-  <!-- Conteneur de scroll principal -->
+  <!-- ── Conteneur de scroll principal ── -->
   <div id="scroll-container">
 
-    <!-- Section 1 : Iriatai — présentation marque -->
+    <!-- Section 1 : La marque -->
     <section class="scroll-section section-content align-left"
-             data-enter="8" data-leave="24" data-animation="slide-left">
+             data-enter="8" data-leave="26" data-animation="slide-left">
       <div class="section-inner">
         <span class="section-label">001 — La marque</span>
         <h2 class="section-heading">Iriatai.</h2>
-        <p class="section-body">La surface de la mer, là où la lumière change à chaque heure. Chaque pièce naît en Nouvelle-Calédonie, à la main, avec la lenteur que mérite chaque bijou.</p>
+        <p class="section-body">Un atelier en Nouvelle-Calédonie. Des bijoux façonnés à la main, avec la lenteur que mérite chaque pièce.</p>
       </div>
     </section>
 
-    <!-- Section 2 : Le collier -->
+    <!-- Section 2 : Le bijou -->
     <section class="scroll-section section-content align-right"
-             data-enter="26" data-leave="42" data-animation="fade-up">
+             data-enter="28" data-leave="48" data-animation="fade-up">
       <div class="section-inner">
-        <span class="section-label">002 — Le collier</span>
-        <h2 class="section-heading">Un bijou fin,<br/><em>structuré</em>.</h2>
-        <p class="section-body">Conçu pour être porté chaque jour. Fabriqué pour traverser le temps. Entre 150 et 400€, chaque pièce est une création à part entière.</p>
+        <span class="section-label">002 — Le bijou</span>
+        <h2 class="section-heading">Pas de série.<br/><em>Jamais.</em></h2>
+        <p class="section-body">Chaque collier est pensé pour une personne. Entre 150 et 400€ — le prix d'une pièce que vous ne retrouverez nulle part ailleurs.</p>
       </div>
     </section>
 
-    <!-- Section 3 : La raie manta -->
-    <section class="scroll-section section-manta"
-             data-enter="44" data-leave="60" data-animation="scale-up">
-      <div class="manta-container">
-        <div class="manta-svg-wrap" id="manta-svg-wrap">
-          <!-- SVG raie manta inline -->
-          <svg class="manta-svg" id="manta-svg" viewBox="0 0 800 400" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-            <!-- Corps principal -->
-            <path d="M400 200
-              C 350 140, 220 100, 80 160
-              C 30 180, 10 200, 20 220
-              C 40 250, 120 240, 200 220
-              C 280 200, 340 195, 400 200
-              C 460 205, 520 200, 600 220
-              C 680 240, 760 250, 780 220
-              C 790 200, 770 180, 720 160
-              C 580 100, 450 140, 400 200Z"
-              fill="currentColor" opacity="0.18"/>
-            <!-- Aile gauche — détail -->
-            <path d="M400 200
-              C 360 160, 250 120, 120 155
-              C 70 168, 30 188, 25 210"
-              stroke="currentColor" stroke-width="1" opacity="0.35" fill="none"/>
-            <!-- Aile droite — détail -->
-            <path d="M400 200
-              C 440 160, 550 120, 680 155
-              C 730 168, 770 188, 775 210"
-              stroke="currentColor" stroke-width="1" opacity="0.35" fill="none"/>
-            <!-- Queue -->
-            <path d="M400 200 C 400 230, 398 270, 392 320 C 390 340, 385 360, 380 375"
-              stroke="currentColor" stroke-width="1.5" opacity="0.4" fill="none" stroke-linecap="round"/>
-            <!-- Céphalopodes (cornes) -->
-            <path d="M370 185 C 360 170, 345 158, 330 150"
-              stroke="currentColor" stroke-width="1" opacity="0.3" fill="none" stroke-linecap="round"/>
-            <path d="M430 185 C 440 170, 455 158, 470 150"
-              stroke="currentColor" stroke-width="1" opacity="0.3" fill="none" stroke-linecap="round"/>
-          </svg>
-        </div>
-        <div class="section-inner manta-text">
-          <span class="section-label">003 — Le symbole</span>
-          <p class="section-body manta-quote">"Iriatai, c'est aussi une raie qui traverse le lagon en silence. Pas de bruit, pas de hâte. Juste la grâce d'être là."</p>
-        </div>
-      </div>
-    </section>
-
-    <!-- Section 4 : Savoir-faire -->
+    <!-- Section 3 : Savoir-faire -->
     <section class="scroll-section section-content align-left"
-             data-enter="62" data-leave="78" data-animation="stagger-up">
+             data-enter="52" data-leave="72" data-animation="stagger-up">
       <div class="section-inner">
-        <span class="section-label">004 — Savoir-faire</span>
+        <span class="section-label">003 — Savoir-faire</span>
         <h2 class="section-heading">Le geste<br/>qui reste.</h2>
-        <p class="section-body">Chaque pièce prend plusieurs heures. Aucune n'est identique. C'est la trace du geste qui reste.</p>
         <ul class="craft-list">
-          <li class="craft-item"><span class="craft-num">01</span><span>Conception à la main</span></li>
-          <li class="craft-item"><span class="craft-num">02</span><span>Pièces uniques, non reproductibles</span></li>
-          <li class="craft-item"><span class="craft-num">03</span><span>Matériaux sélectionnés en Calédonie</span></li>
+          <li class="craft-item"><span class="craft-num">01</span><span>Argent, laiton, nacre de Calédonie</span></li>
+          <li class="craft-item"><span class="craft-num">02</span><span>Aucune reproduction — chaque pièce est unique</span></li>
+          <li class="craft-item"><span class="craft-num">03</span><span>Livraison internationale depuis Nouméa</span></li>
         </ul>
       </div>
     </section>
 
-    <!-- Section 5 : CTA -->
+    <!-- Section 4 : CTA -->
     <section class="scroll-section section-cta"
-             data-enter="82" data-leave="100" data-animation="fade-up" data-persist="true" id="contact">
+             data-enter="78" data-leave="100" data-animation="fade-up" data-persist="true" id="contact">
       <div class="section-inner cta-inner">
-        <span class="section-label">Prendre contact</span>
-        <h2 class="section-heading cta-heading">Faire le voyage.</h2>
-        <p class="section-body">Chaque bijou Iriatai est une pièce unique. Pour en faire vôtre, une seule façon : nous écrire.</p>
-        <a href="mailto:contact@iriatai.nc" class="cta-button">Contacter Iriatai</a>
-        <p class="cta-note">Nouvelle-Calédonie — Livraison internationale</p>
+        <span class="section-label">004 — Réserver</span>
+        <h2 class="section-heading cta-heading">Réservez<br/>la vôtre.</h2>
+        <p class="section-body">La collection est limitée par nature. Écrivez-nous pour décrire ce que vous cherchez.</p>
+        <a href="mailto:contact@iriatai.nc" class="cta-button">Contacter l'atelier</a>
+        <p class="cta-note">Réponse sous 48h — Livraison mondiale</p>
       </div>
     </section>
 

@@ -1,23 +1,33 @@
 /* ============================================================
    IRIATAI — app.js
    Scroll-driven canvas scrubbing + GSAP animations
+   Architecture :
+     1. Canvas DPR + drawFrame
+     2. Préchargement des frames (2 phases)
+     3. Lenis smooth scroll
+     4. Positionnement des sections (midpoint enter/leave)
+     5. Canvas scrub lié au scroll
+     6. Hero : animation d'entrée + transition vers canvas
+     7. Marquee horizontal + opacité
+     8. Overlay sombre
+     9. Animations des sections scroll
    ============================================================ */
 
 "use strict";
 
 /* ── Constantes ── */
-const FRAME_COUNT   = 180;
-const FRAME_DIR     = "frames/";
-const FRAME_EXT     = "webp";
-const FRAME_SPEED   = 2.0;   // accélération : animation produit complète à ~50% scroll
-const IMAGE_SCALE   = 0.88;  // padded-cover (ne clippe pas dans le header)
-const BG_COLOR_DEF  = "#07090F";
+const FRAME_COUNT  = 180;
+const FRAME_DIR    = "frames/";
+const FRAME_EXT    = "webp";
+const FRAME_SPEED  = 2.0;   // animation produit complète à ~50% scroll
+const IMAGE_SCALE  = 0.88;  // padded-cover — ne clippe pas dans le header
+const BG_COLOR_DEF = "#07090F";
 
 /* ── État global ── */
-let frames        = [];
-let currentFrame  = 0;
-let bgColor       = BG_COLOR_DEF;
-let canvasReady   = false;
+let frames       = [];
+let currentFrame = 0;
+let bgColor      = BG_COLOR_DEF;
+let canvasReady  = false;
 let lenis;
 
 /* ── Éléments DOM ── */
@@ -27,11 +37,9 @@ const loaderPct   = document.getElementById("loader-percent");
 const canvasWrap  = document.getElementById("canvas-wrap");
 const canvas      = document.getElementById("canvas");
 const ctx         = canvas.getContext("2d");
-const heroSection = document.getElementById("hero");
 const scrollCont  = document.getElementById("scroll-container");
-const darkOverlay = document.getElementById("dark-overlay");
-const marqueeWrap = document.getElementById("marquee-manta");
-const mantaSvgW   = document.getElementById("manta-svg-wrap");
+const heroSection = document.getElementById("hero");
+const marqueeWrap = document.getElementById("marquee-main");
 
 /* ============================================================
    1. Canvas — redimensionnement DPR
@@ -46,11 +54,16 @@ function resizeCanvas() {
   if (canvasReady) drawFrame(currentFrame);
 }
 
-window.addEventListener("resize", resizeCanvas);
+window.addEventListener("resize", () => {
+  resizeCanvas();
+  positionSections();
+  ScrollTrigger.refresh();
+});
+
 resizeCanvas();
 
 /* ============================================================
-   2. Dessin d'une frame — padded-cover + bg couleur
+   2. Dessin d'une frame — padded-cover + bg samplé
    ============================================================ */
 function drawFrame(index) {
   const img = frames[index];
@@ -72,7 +85,7 @@ function drawFrame(index) {
   ctx.drawImage(img, dx, dy, dw, dh);
 }
 
-/* ── Échantillonnage couleur de bord ── */
+/* ── Échantillonnage couleur de bord (coin supérieur gauche) ── */
 function sampleBgColor(img) {
   const offscreen = document.createElement("canvas");
   offscreen.width  = 4;
@@ -80,7 +93,6 @@ function sampleBgColor(img) {
   const oc = offscreen.getContext("2d");
   oc.drawImage(img, 0, 0, 4, 4);
   const d = oc.getImageData(0, 0, 1, 1).data;
-  // Darken légèrement pour éviter les halos
   const r = Math.max(0, d[0] - 10);
   const g = Math.max(0, d[1] - 10);
   const b = Math.max(0, d[2] - 10);
@@ -106,16 +118,15 @@ function loadFrame(n) {
 }
 
 async function preloadFrames() {
-  // Phase 1 : 10 premières frames (affichage rapide)
+  // Phase 1 : 10 premières frames — premier rendu rapide
   const phase1 = Array.from({ length: 10 }, (_, i) => loadFrame(i + 1));
   await Promise.all(phase1);
 
   drawFrame(0);
   canvasReady = true;
 
-  // Phase 2 : frames restantes en arrière-plan avec barre de progression
+  // Phase 2 : frames restantes avec barre de progression
   let loaded = 10;
-  const phase2 = Array.from({ length: FRAME_COUNT - 10 }, (_, i) => i + 11);
 
   const updateProgress = (count) => {
     const pct = Math.round((count / FRAME_COUNT) * 100);
@@ -126,11 +137,10 @@ async function preloadFrames() {
   updateProgress(10);
 
   await Promise.all(
-    phase2.map((n) =>
+    Array.from({ length: FRAME_COUNT - 10 }, (_, i) => i + 11).map((n) =>
       loadFrame(n).then((result) => {
         loaded++;
         updateProgress(loaded);
-        // Échantillonnage bg toutes les 20 frames
         if (result.img && loaded % 20 === 0) {
           bgColor = sampleBgColor(result.img);
         }
@@ -138,14 +148,14 @@ async function preloadFrames() {
     )
   );
 
-  // Toutes les frames prêtes — cacher le loader
+  // Toutes les frames prêtes — masquer le loader
   loaderBar.style.width = "100%";
   loaderPct.textContent = "100%";
   await sleep(400);
   loader.classList.add("hidden");
 
-  // Lancer les animations hero après loader
-  setTimeout(animateHero, 600);
+  // Animer l'entrée du hero après disparition du loader
+  animateHeroEntrance();
 }
 
 /* ============================================================
@@ -165,6 +175,8 @@ function initLenis() {
 
 /* ============================================================
    5. Positionnement des sections (midpoint enter/leave)
+   Les sections sont dans #scroll-container (position relative)
+   Les % sont relatifs à la hauteur totale de scroll-container
    ============================================================ */
 function positionSections() {
   const totalH = scrollCont.offsetHeight;
@@ -173,13 +185,87 @@ function positionSections() {
     const enter = parseFloat(section.dataset.enter) / 100;
     const leave = parseFloat(section.dataset.leave) / 100;
     const mid   = (enter + leave) / 2;
-    const topPx = totalH * mid;
-    section.style.top = topPx + "px";
+    section.style.top = (totalH * mid) + "px";
   });
 }
 
 /* ============================================================
-   6. Canvas scrub lié au scroll
+   6a. Animation d'entrée du hero (déclenché après loader)
+   ============================================================ */
+function animateHeroEntrance() {
+  const label    = heroSection.querySelector(".hero-label");
+  const words    = heroSection.querySelectorAll(".word");
+  const tagline  = heroSection.querySelector(".hero-tagline");
+  const hint     = document.getElementById("hero-scroll-hint");
+
+  const tl = gsap.timeline();
+
+  tl.to(label, {
+    opacity: 1, y: 0,
+    duration: 0.8, ease: "power3.out",
+  })
+  .to(words, {
+    opacity: 1, y: 0,
+    stagger: 0.12, duration: 1.0, ease: "power3.out",
+  }, "-=0.3")
+  .to(tagline, {
+    opacity: 1, y: 0,
+    duration: 0.7, ease: "power3.out",
+  }, "-=0.4")
+  .to(hint, {
+    opacity: 1,
+    duration: 0.6, ease: "power2.out",
+  }, "-=0.2");
+}
+
+/* ============================================================
+   6b. Transition hero → canvas (circle-wipe au premier scroll)
+   Le hero s'efface, le canvas se révèle via clip-path circle
+   ============================================================ */
+function initHeroTransition() {
+  // Le scroll-container est APRÈS le hero dans le flux normal.
+  // On utilise le scroll global pour piloter les deux.
+  // heroSection fait 100vh hors du scroll-container.
+  // Dès que l'utilisateur commence à scroller au-delà du hero,
+  // on active le canvas.
+
+  // Ratio de transition : 0 à 8% du scroll-container = ouverture du canvas
+  const WIPE_START  = 0.0;   // début du circle-wipe
+  const WIPE_END    = 0.08;  // canvas pleinement ouvert
+  const HERO_FADE_END = 0.05; // hero invisible à ce point
+
+  ScrollTrigger.create({
+    trigger: scrollCont,
+    start: "top top",
+    end: "bottom bottom",
+    scrub: true,
+    onUpdate: (self) => {
+      const p = self.progress;
+
+      // ── Hero : s'efface rapidement dès le début du scroll ──
+      const heroOpacity = Math.max(0, 1 - p / HERO_FADE_END);
+      heroSection.style.opacity = heroOpacity;
+
+      // ── Canvas : s'ouvre via circle-wipe ──
+      const wipeP  = Math.min(1, Math.max(0, (p - WIPE_START) / (WIPE_END - WIPE_START)));
+      const radius = wipeP * 80; // de 0% à 80% du viewport
+      canvasWrap.style.clipPath = `circle(${radius}% at 50% 50%)`;
+
+      // ── Marquee : visible entre 8% et 85% ──
+      const mEnter = 0.08, mLeave = 0.85, mFade = 0.04;
+      let mOp = 0;
+      if (p >= mEnter && p < mLeave) {
+        const fadeIn  = Math.min(1, (p - mEnter) / mFade);
+        const fadeOut = Math.min(1, (mLeave - p) / mFade);
+        mOp = Math.min(fadeIn, fadeOut);
+      }
+      marqueeWrap.style.opacity = mOp;
+    },
+  });
+}
+
+/* ============================================================
+   7. Canvas scrub lié au scroll
    ============================================================ */
 function initCanvasScrub() {
   ScrollTrigger.create({
@@ -202,71 +288,7 @@ function initCanvasScrub() {
 }
 
 /* ============================================================
-   7. Transition hero → canvas (circle wipe)
-   ============================================================ */
-function initHeroTransition() {
-  ScrollTrigger.create({
-    trigger: scrollCont,
-    start: "top top",
-    end: "bottom bottom",
-    scrub: true,
-    onUpdate: (self) => {
-      const p = self.progress;
-
-      // Hero s'efface rapidement dès le premier scroll
-      const heroOp = Math.max(0, 1 - p * 18);
-      heroSection.style.opacity = heroOp;
-
-      // Canvas s'ouvre en cercle
-      const wipeP = Math.min(1, Math.max(0, (p - 0.005) / 0.08));
-      const radius = wipeP * 80;
-      canvasWrap.style.clipPath = `circle(${radius}% at 50% 50%)`;
-
-      // Marquee apparaît entre 8% et 85% du scroll
-      const mEnter = 0.08, mLeave = 0.85, mFade = 0.04;
-      let mOp = 0;
-      if (p >= mEnter && p < mLeave) {
-        const fadeIn  = Math.min(1, (p - mEnter) / mFade);
-        const fadeOut = Math.min(1, (mLeave - p) / mFade);
-        mOp = Math.min(fadeIn, fadeOut);
-      }
-      marqueeWrap.style.opacity = mOp;
-    },
-  });
-}
-
-/* ============================================================
-   8. Overlay sombre (section raie manta)
-   ============================================================ */
-function initDarkOverlay() {
-  const enter    = 0.42;
-  const leave    = 0.62;
-  const fadeZone = 0.04;
-
-  ScrollTrigger.create({
-    trigger: scrollCont,
-    start: "top top",
-    end: "bottom bottom",
-    scrub: true,
-    onUpdate: (self) => {
-      const p = self.progress;
-      let op = 0;
-
-      if (p >= enter - fadeZone && p <= enter) {
-        op = ((p - (enter - fadeZone)) / fadeZone) * 0.88;
-      } else if (p > enter && p < leave) {
-        op = 0.88;
-      } else if (p >= leave && p <= leave + fadeZone) {
-        op = 0.88 * (1 - (p - leave) / fadeZone);
-      }
-
-      darkOverlay.style.opacity = op;
-    },
-  });
-}
-
-/* ============================================================
-   9. Marquee horizontal
+   8. Marquee horizontal (déplacement lié au scroll)
    ============================================================ */
 function initMarquee() {
   const speed = parseFloat(marqueeWrap.dataset.scrollSpeed) || -28;
@@ -283,42 +305,10 @@ function initMarquee() {
 }
 
 /* ============================================================
-   10. Animation de la raie manta (flottement)
-   ============================================================ */
-function initMantaFloat() {
-  // Flottement continu passif
-  gsap.to("#manta-svg", {
-    y: -18,
-    x: 12,
-    rotation: 1.5,
-    duration: 5,
-    ease: "sine.inOut",
-    yoyo: true,
-    repeat: -1,
-  });
-
-  // Révélation au scroll
-  ScrollTrigger.create({
-    trigger: scrollCont,
-    start: "top top",
-    end: "bottom bottom",
-    scrub: true,
-    onUpdate: (self) => {
-      const p = self.progress;
-      const enter = 0.44, leave = 0.60, fade = 0.05;
-      let op = 0;
-      if (p >= enter && p < leave) {
-        const fi = Math.min(1, (p - enter) / fade);
-        const fo = Math.min(1, (leave - p) / fade);
-        op = Math.min(fi, fo);
-      }
-      mantaSvgW.style.opacity = op;
-    },
-  });
-}
-
-/* ============================================================
-   11. Animations des sections scroll
+   9. Animations des sections scroll
+   Chaque section lit son data-animation et reçoit un effet
+   différent. Les sections avec data-persist="true" restent
+   visibles une fois animées.
    ============================================================ */
 function setupSectionAnimation(section) {
   const type    = section.dataset.animation;
@@ -327,7 +317,7 @@ function setupSectionAnimation(section) {
   const leave   = parseFloat(section.dataset.leave) / 100;
 
   const children = section.querySelectorAll(
-    ".section-label, .section-heading, .section-body, .manta-quote, .craft-item, .cta-button, .cta-note"
+    ".section-label, .section-heading, .section-body, .craft-item, .cta-button, .cta-note"
   );
 
   const tl = gsap.timeline({ paused: true });
@@ -354,17 +344,17 @@ function setupSectionAnimation(section) {
       });
       break;
 
-    case "scale-up":
-      tl.from(children, {
-        scale: 0.88, opacity: 0,
-        stagger: 0.12, duration: 1.0, ease: "power2.out",
-      });
-      break;
-
     case "stagger-up":
       tl.from(children, {
         y: 60, opacity: 0,
         stagger: 0.15, duration: 0.85, ease: "power3.out",
+      });
+      break;
+
+    case "scale-up":
+      tl.from(children, {
+        scale: 0.88, opacity: 0,
+        stagger: 0.12, duration: 1.0, ease: "power2.out",
       });
       break;
 
@@ -382,6 +372,9 @@ function setupSectionAnimation(section) {
       });
   }
 
+  // Fenêtre d'animation : 12% du scroll depuis le point d'entrée
+  const WINDOW = 0.12;
+
   ScrollTrigger.create({
     trigger: scrollCont,
     start: "top top",
@@ -389,20 +382,23 @@ function setupSectionAnimation(section) {
     scrub: false,
     onUpdate: (self) => {
       const p = self.progress;
-      const window_size = 0.12;
 
       if (p >= enter && (persist || p < leave)) {
-        // Dans la fenêtre : jouer vers l'avant
-        const localP = Math.min(1, (p - enter) / window_size);
+        // Dans la fenêtre d'affichage : animer vers l'avant
+        const localP = Math.min(1, (p - enter) / WINDOW);
         tl.progress(localP);
-        if (!persist) section.style.opacity = "1";
+        section.style.opacity = "1";
+        section.style.pointerEvents = persist ? "auto" : "none";
       } else if (!persist && p >= leave) {
-        // Après la fenêtre de sortie : effacer
+        // Après la fenêtre : effacer progressivement
         const fadeOutP = Math.min(1, (p - leave) / 0.06);
         section.style.opacity = String(1 - fadeOutP);
-      } else if (p < enter) {
+        section.style.pointerEvents = "none";
+      } else {
+        // Avant l'entrée : invisible
         tl.progress(0);
         section.style.opacity = "0";
+        section.style.pointerEvents = "none";
       }
     },
   });
@@ -410,27 +406,6 @@ function setupSectionAnimation(section) {
 
 function initSectionAnimations() {
   document.querySelectorAll(".scroll-section").forEach(setupSectionAnimation);
-}
-
-/* ============================================================
-   12. Animation hero (après loader)
-   ============================================================ */
-function animateHero() {
-  const tl = gsap.timeline();
-
-  tl.to(".hero-label", {
-    opacity: 1, y: 0, duration: 1.0, ease: "power3.out",
-  })
-  .to(".hero-heading .word", {
-    opacity: 1, y: 0,
-    stagger: 0.12, duration: 1.0, ease: "power3.out",
-  }, "-=0.5")
-  .to(".hero-tagline", {
-    opacity: 1, y: 0, duration: 0.9, ease: "power3.out",
-  }, "-=0.4")
-  .to(".hero-scroll-indicator", {
-    opacity: 1, duration: 0.8, ease: "power2.out",
-  }, "-=0.3");
 }
 
 /* ============================================================
@@ -450,19 +425,11 @@ async function init() {
   positionSections();
   initCanvasScrub();
   initHeroTransition();
-  initDarkOverlay();
   initMarquee();
-  initMantaFloat();
   initSectionAnimations();
 
-  // Démarrer le chargement des frames
+  // Précharger les frames (lance l'animation hero une fois terminé)
   await preloadFrames();
 }
-
-// Recalcul des positions si redimensionnement
-window.addEventListener("resize", () => {
-  positionSections();
-  ScrollTrigger.refresh();
-});
 
 init();
