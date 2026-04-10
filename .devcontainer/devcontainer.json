@@ -1,0 +1,5 @@
+{
+  "name": "site-iriatai",
+  "image": "epic_neumann:latest",
+  "forwardPorts": [8000]
+}
